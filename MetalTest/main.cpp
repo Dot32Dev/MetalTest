@@ -5,10 +5,26 @@
 //  Created by Dot32  on 15/6/2026.
 //
 
+#define NS_PRIVATE_IMPLEMENTATION
+#define MTL_PRIVATE_IMPLEMENTATION
+#define MTK_PRIVATE_IMPLEMENTATION
+#define CA_PRIVATE_IMPLEMENTATION
+
+#include "application.h"
 #include <iostream>
+#include <Metal/Metal.hpp>
+#include <AppKit/AppKit.hpp>
+#include <MetalKit/MetalKit.hpp>
 
 int main(int argc, const char * argv[]) {
-    // insert code here...
-    std::cout << "Hello, World!\n";
+    NS::AutoreleasePool* autoreleasePool = NS::AutoreleasePool::alloc()->init();
+    
+    AppDelegate delegate;
+    
+    NS::Application* app = NS::Application::sharedApplication();
+    app->setDelegate(&delegate);
+    app->run();
+    
+    autoreleasePool->release();
     return 0;
 }

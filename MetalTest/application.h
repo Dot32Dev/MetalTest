@@ -1,0 +1,45 @@
+//
+//  application.h
+//  MetalTest
+//
+//  Created by Dot32  on 15/6/2026.
+//
+
+#ifndef APPLICATION_H
+#define APPLICATION_H
+
+#include <MetalKit/MetalKit.hpp>
+
+class MTKViewDelegate : public MTK::ViewDelegate {
+    public:
+        MTKViewDelegate(MTL::Device* device);
+        virtual ~MTKViewDelegate() override;
+        virtual void drawInMTKView(MTK::View* view) override;
+    private:
+        MTL::Device* device;
+        MTL::CommandQueue* commandQueue;
+};
+
+class AppDelegate : public NS::ApplicationDelegate {
+    public:
+        ~AppDelegate();
+        NS::Menu* createMenuBar();  
+        virtual void applicationWillFinishLaunching(
+            NS::Notification* notification
+        ) override;
+        
+        virtual void applicationDidFinishLaunching(
+            NS::Notification* notification
+        ) override;
+        
+        virtual bool applicationShouldTerminateAfterLastWindowClosed(
+            NS::Application* sender
+        ) override;
+    private:
+        NS::Window* window;
+        MTK::View* view;
+        MTL::Device* device;
+        MTKViewDelegate* viewDelegate = nullptr;
+};
+
+#endif
