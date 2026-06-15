@@ -110,7 +110,7 @@ void AppDelegate::applicationDidFinishLaunching(
 
     view = MTK::View::alloc()->init(frame, device);
     view->setColorPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB);
-    view->setClearColor(MTL::ClearColor::Make(1.0, 0.0, 0.0, 1.0));
+    view->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, 1.0));
 
     viewDelegate = new MTKViewDelegate(device);
     view->setDelegate(viewDelegate);
