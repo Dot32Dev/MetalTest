@@ -15,11 +15,17 @@ class ViewDelegate : public MTK::ViewDelegate {
         ViewDelegate(MTL::Device* device);
         virtual ~ViewDelegate() override;
         virtual void drawInMTKView(MTK::View* view) override;
-        void buildPipeline();
     private:
         MTL::Device* device;
         MTL::CommandQueue* command_queue;
         MTL::RenderPipelineState* triangle_pipeline;
+        MTL::Buffer* triangle_mesh;
+        MTL::Buffer* buildTriangle();
+        MTL::RenderPipelineState* buildShader(
+            std::string filename, 
+            std::string vert_name, 
+            std::string frag_name
+        );
 };
 
 class AppDelegate : public NS::ApplicationDelegate {

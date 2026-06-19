@@ -9,8 +9,13 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <simd/simd.h>
 
 using NS::StringEncoding::UTF8StringEncoding;
+
+struct Vertex {
+    simd::float3 pos;
+};
 
 AppDelegate::~AppDelegate() {
     view->release();
@@ -142,12 +147,38 @@ ViewDelegate::ViewDelegate(MTL::Device* device):
     device(device->retain())
 {
     command_queue = device->newCommandQueue();
-    buildPipeline();
+    triangle_mesh = buildTriangle();
+    triangle_pipeline = buildShader(
+        "shaders/triangle.metal",
+        "vertex_main",
+        "frag_main"
+    );
 }
 
-void ViewDelegate::buildPipeline() {
+MTL::Buffer* ViewDelegate::buildTriangle() {
+    Vertex vertices[] = {
+        {{-0.75, -0.75, 0.0}},
+        {{0.75, -0.75, 0.0}},
+        {{0.0, 0.75, 0.0}},
+    };
+    
+    MTL::Buffer* buffer = device->newBuffer(
+        3 * sizeof(Vertex),
+        MTL::ResourceStorageModeManaged
+    );
+    
+    memcpy(buffer->contents(), vertices, 3 * sizeof(Vertex));
+    buffer->didModifyRange(NS::Range(0, 3));
+    return buffer;
+}
+
+MTL::RenderPipelineState* ViewDelegate::buildShader(
+   std::string filename,
+   std::string vert_name,
+   std::string frag_name
+) {
     std::ifstream file;
-    file.open("shaders/triangle.metal");
+    file.open(filename);
     std::stringstream reader;
     reader << file.rdbuf();
     std::string raw_string = reader.str();
@@ -165,10 +196,10 @@ void ViewDelegate::buildPipeline() {
     }
 
     MTL::Function* vert_fn = library->newFunction(
-        NS::String::string("vertex_main", UTF8StringEncoding)
+        NS::String::string(vert_name.c_str(), UTF8StringEncoding)
     );
     MTL::Function* frag_fn = library->newFunction(
-        NS::String::string("frag_main", UTF8StringEncoding)
+        NS::String::string(frag_name.c_str(), UTF8StringEncoding)
     );
     
     MTL::RenderPipelineDescriptor* descriptor;
@@ -179,8 +210,11 @@ void ViewDelegate::buildPipeline() {
         MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB
     );
     
-    triangle_pipeline = device->newRenderPipelineState(descriptor, &error);
-    if (!triangle_pipeline) {
+    MTL::RenderPipelineState* pipeline = device->newRenderPipelineState(
+        descriptor, 
+        &error
+    );
+    if (!pipeline) {
         std::cerr << error->localizedDescription()->utf8String() << std::endl;
     }
     
@@ -188,9 +222,13 @@ void ViewDelegate::buildPipeline() {
     vert_fn->release();
     frag_fn->release();
     library->release();
+    
+    return pipeline;
 }
 
 ViewDelegate::~ViewDelegate() {
+    triangle_mesh->release();
+    triangle_pipeline->release();
     command_queue->release();
     device->release();
 }
@@ -203,6 +241,7 @@ void ViewDelegate::drawInMTKView(MTK::View* view) {
     MTL::RenderCommandEncoder* enc = cmd->renderCommandEncoder( rpd );
     
     enc->setRenderPipelineState(triangle_pipeline);
+    enc->setVertexBuffer(triangle_mesh, 0, 0);
     enc->drawPrimitives(
         MTL::PrimitiveType::PrimitiveTypeTriangle,
         NS::UInteger(0),
