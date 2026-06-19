@@ -18,9 +18,12 @@ class ViewDelegate : public MTK::ViewDelegate {
     private:
         MTL::Device* device;
         MTL::CommandQueue* command_queue;
-        MTL::RenderPipelineState* triangle_pipeline;
-        MTL::Buffer* triangle_mesh;
-        MTL::Buffer* buildTriangle();
+        MTL::RenderPipelineState* pipeline;
+        MTL::Buffer* vertex_buffer;
+        MTL::Buffer* index_buffer;
+        int index_count;
+        void buildTriangle();
+        void buildQuad();
         MTL::RenderPipelineState* buildShader(
             std::string filename, 
             std::string vert_name, 

@@ -147,29 +147,62 @@ ViewDelegate::ViewDelegate(MTL::Device* device):
     device(device->retain())
 {
     command_queue = device->newCommandQueue();
-    triangle_mesh = buildTriangle();
-    triangle_pipeline = buildShader(
+    buildQuad();
+    pipeline = buildShader(
         "shaders/triangle.metal",
         "vertex_main",
         "frag_main"
     );
 }
 
-MTL::Buffer* ViewDelegate::buildTriangle() {
+void ViewDelegate::buildTriangle() {
     Vertex vertices[] = {
         {{-0.75, -0.75, 0.0}},
         {{0.75, -0.75, 0.0}},
         {{0.0, 0.75, 0.0}},
     };
+    ushort indices[] = {0, 1, 2};
+    index_count = 3;
     
-    MTL::Buffer* buffer = device->newBuffer(
+    vertex_buffer = device->newBuffer(
         3 * sizeof(Vertex),
         MTL::ResourceStorageModeManaged
     );
     
-    memcpy(buffer->contents(), vertices, 3 * sizeof(Vertex));
-    buffer->didModifyRange(NS::Range(0, 3));
-    return buffer;
+    memcpy(vertex_buffer->contents(), vertices, 3 * sizeof(Vertex));
+    vertex_buffer->didModifyRange(NS::Range(0, 3));
+    
+    index_buffer = device->newBuffer(
+        index_count * sizeof(ushort),
+        MTL::ResourceStorageModeManaged
+    );
+    memcpy(index_buffer->contents(), indices, index_count * sizeof(Vertex));
+    index_buffer->didModifyRange(NS::Range(0, index_count));
+}
+
+void ViewDelegate::buildQuad() {
+    Vertex vertices[] = {
+        {{-0.75, -0.75, 0.0}},
+        {{0.75, -0.75, 0.0}},
+        {{0.75, 0.75, 0.0}},
+        {{-0.75, 0.75, 0.0}},
+    };
+    ushort indices[] = {0, 1, 2, 2, 3, 0};
+    index_count = 6;
+    
+    vertex_buffer = device->newBuffer(
+        4 * sizeof(Vertex),
+        MTL::ResourceStorageModeManaged
+    );
+    memcpy(vertex_buffer->contents(), vertices, 4 * sizeof(Vertex));
+    vertex_buffer->didModifyRange(NS::Range(0, 4));
+    
+    index_buffer = device->newBuffer(
+        index_count * sizeof(ushort),
+        MTL::ResourceStorageModeManaged
+    );
+    memcpy(index_buffer->contents(), indices, index_count * sizeof(Vertex));
+    index_buffer->didModifyRange(NS::Range(0, index_count));
 }
 
 MTL::RenderPipelineState* ViewDelegate::buildShader(
@@ -227,8 +260,9 @@ MTL::RenderPipelineState* ViewDelegate::buildShader(
 }
 
 ViewDelegate::~ViewDelegate() {
-    triangle_mesh->release();
-    triangle_pipeline->release();
+    vertex_buffer->release();
+    index_buffer->release();
+    pipeline->release();
     command_queue->release();
     device->release();
 }
@@ -240,13 +274,15 @@ void ViewDelegate::drawInMTKView(MTK::View* view) {
     MTL::RenderPassDescriptor* rpd = view->currentRenderPassDescriptor();
     MTL::RenderCommandEncoder* enc = cmd->renderCommandEncoder( rpd );
     
-    enc->setRenderPipelineState(triangle_pipeline);
-    enc->setVertexBuffer(triangle_mesh, 0, 0);
-    enc->drawPrimitives(
-        MTL::PrimitiveType::PrimitiveTypeTriangle,
-        NS::UInteger(0),
-        NS::UInteger(3)
-    );
+    enc->setRenderPipelineState(pipeline);
+    enc->setVertexBuffer(vertex_buffer, 0, 0);
+    enc->drawIndexedPrimitives(MTL::PrimitiveTypeTriangle,
+       NS::UInteger(6),
+       MTL::IndexTypeUInt16,
+       index_buffer,
+       NS::UInteger(0),
+       NS::UInteger(1)
+   );
     
     enc->endEncoding();
     cmd->presentDrawable(view->currentDrawable());
