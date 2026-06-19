@@ -7,9 +7,11 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C1D259262FDF1CED001F1756 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1D259252FDF1CED001F1756 /* main.cpp */; };
 		C1D25A4D2FDF210F001F1756 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1D25A4C2FDF210F001F1756 /* MetalKit.framework */; };
 		C1D25A4F2FDF2116001F1756 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1D25A4E2FDF2116001F1756 /* AppKit.framework */; };
 		C1D25A512FDF2124001F1756 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1D25A502FDF2124001F1756 /* Metal.framework */; };
+		C1D25A552FDFD37C001F1756 /* application.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1D25A532FDFD37A001F1756 /* application.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -26,15 +28,23 @@
 
 /* Begin PBXFileReference section */
 		C1D257682FDF1BBF001F1756 /* MetalTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MetalTest; sourceTree = BUILT_PRODUCTS_DIR; };
+		C1D259252FDF1CED001F1756 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		C1D25A4C2FDF210F001F1756 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
 		C1D25A4E2FDF2116001F1756 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = System/Library/Frameworks/AppKit.framework; sourceTree = SDKROOT; };
 		C1D25A502FDF2124001F1756 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
+		C1D25A522FDFD36D001F1756 /* application.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = application.h; sourceTree = "<group>"; };
+		C1D25A532FDFD37A001F1756 /* application.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = application.cpp; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		C1D2576A2FDF1BBF001F1756 /* MetalTest */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = MetalTest;
+			sourceTree = "<group>";
+		};
+		C1D25A582FE4DDF6001F1756 /* shaders */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = shaders;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -56,6 +66,10 @@
 		C1D2575F2FDF1BBF001F1756 = {
 			isa = PBXGroup;
 			children = (
+				C1D25A582FE4DDF6001F1756 /* shaders */,
+				C1D25A522FDFD36D001F1756 /* application.h */,
+				C1D25A532FDFD37A001F1756 /* application.cpp */,
+				C1D259252FDF1CED001F1756 /* main.cpp */,
 				C1D2576A2FDF1BBF001F1756 /* MetalTest */,
 				C1D25A4B2FDF210E001F1756 /* Frameworks */,
 				C1D257692FDF1BBF001F1756 /* Products */,
@@ -97,6 +111,7 @@
 			);
 			fileSystemSynchronizedGroups = (
 				C1D2576A2FDF1BBF001F1756 /* MetalTest */,
+				C1D25A582FE4DDF6001F1756 /* shaders */,
 			);
 			name = MetalTest;
 			packageProductDependencies = (
@@ -116,6 +131,7 @@
 				TargetAttributes = {
 					C1D257672FDF1BBF001F1756 = {
 						CreatedOnToolsVersion = 16.4;
+						LastSwiftMigration = 1640;
 					};
 				};
 			};
@@ -143,6 +159,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1D25A552FDFD37C001F1756 /* application.cpp in Sources */,
+				C1D259262FDF1CED001F1756 /* main.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -267,18 +285,23 @@
 		C1D257702FDF1BBF001F1756 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				"HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/third_party/metal-cpp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
 		C1D257712FDF1BBF001F1756 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				"HEADER_SEARCH_PATHS[arch=*]" = "$(PROJECT_DIR)/third_party/metal-cpp";
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};

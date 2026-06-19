@@ -10,14 +10,16 @@
 
 #include <MetalKit/MetalKit.hpp>
 
-class MTKViewDelegate : public MTK::ViewDelegate {
+class ViewDelegate : public MTK::ViewDelegate {
     public:
-        MTKViewDelegate(MTL::Device* device);
-        virtual ~MTKViewDelegate() override;
+        ViewDelegate(MTL::Device* device);
+        virtual ~ViewDelegate() override;
         virtual void drawInMTKView(MTK::View* view) override;
+        void buildPipeline();
     private:
         MTL::Device* device;
-        MTL::CommandQueue* commandQueue;
+        MTL::CommandQueue* command_queue;
+        MTL::RenderPipelineState* triangle_pipeline;
 };
 
 class AppDelegate : public NS::ApplicationDelegate {
@@ -39,7 +41,7 @@ class AppDelegate : public NS::ApplicationDelegate {
         NS::Window* window;
         MTK::View* view;
         MTL::Device* device;
-        MTKViewDelegate* viewDelegate = nullptr;
+        ViewDelegate* view_delegate = nullptr;
 };
 
 #endif

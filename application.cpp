@@ -6,6 +6,9 @@
 //
 
 #include "application.h"
+#include <iostream>
+#include <fstream>
+#include <sstream>
 
 using NS::StringEncoding::UTF8StringEncoding;
 
@@ -13,7 +16,7 @@ AppDelegate::~AppDelegate() {
     view->release();
     window->release();
     device->release();
-    delete viewDelegate;
+    delete view_delegate;
 }
 
 NS::Menu* AppDelegate::createMenuBar() {
@@ -112,8 +115,8 @@ void AppDelegate::applicationDidFinishLaunching(
     view->setColorPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB);
     view->setClearColor(MTL::ClearColor::Make(0.0, 0.0, 0.0, 1.0));
 
-    viewDelegate = new MTKViewDelegate(device);
-    view->setDelegate(viewDelegate);
+    view_delegate = new ViewDelegate(device);
+    view->setDelegate(view_delegate);
 
     window->setContentView(view);
     window->setTitle(
@@ -134,24 +137,78 @@ bool AppDelegate::applicationShouldTerminateAfterLastWindowClosed(
     return true;
 }
 
-MTKViewDelegate::MTKViewDelegate(MTL::Device* device): 
+ViewDelegate::ViewDelegate(MTL::Device* device): 
     MTK::ViewDelegate(), 
     device(device->retain())
 {
-    commandQueue = device->newCommandQueue();
+    command_queue = device->newCommandQueue();
+    buildPipeline();
 }
 
-MTKViewDelegate::~MTKViewDelegate() {
-    commandQueue->release();
+void ViewDelegate::buildPipeline() {
+    std::ifstream file;
+    file.open("shaders/triangle.metal");
+    std::stringstream reader;
+    reader << file.rdbuf();
+    std::string raw_string = reader.str();
+    
+    NS::String* source = NS::String::string(
+        raw_string.c_str(), 
+        UTF8StringEncoding
+    );
+
+    NS::Error* error = nullptr;
+    MTL::CompileOptions* options = nullptr;
+    MTL::Library* library = device->newLibrary(source, options, &error);
+    if (!library) {
+        std::cerr << error->localizedDescription()->utf8String() << std::endl;
+    }
+
+    MTL::Function* vert_fn = library->newFunction(
+        NS::String::string("vertex_main", UTF8StringEncoding)
+    );
+    MTL::Function* frag_fn = library->newFunction(
+        NS::String::string("frag_main", UTF8StringEncoding)
+    );
+    
+    MTL::RenderPipelineDescriptor* descriptor;
+    descriptor = MTL::RenderPipelineDescriptor::alloc()->init();
+    descriptor->setVertexFunction(vert_fn);
+    descriptor->setFragmentFunction(frag_fn);
+    descriptor->colorAttachments()->object(0)->setPixelFormat(
+        MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB
+    );
+    
+    triangle_pipeline = device->newRenderPipelineState(descriptor, &error);
+    if (!triangle_pipeline) {
+        std::cerr << error->localizedDescription()->utf8String() << std::endl;
+    }
+    
+    descriptor->release();
+    vert_fn->release();
+    frag_fn->release();
+    library->release();
+}
+
+ViewDelegate::~ViewDelegate() {
+    command_queue->release();
     device->release();
 }
 
-void MTKViewDelegate::drawInMTKView( MTK::View* view ) {
+void ViewDelegate::drawInMTKView(MTK::View* view) {
     NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
 
-    MTL::CommandBuffer* cmd = commandQueue->commandBuffer();
+    MTL::CommandBuffer* cmd = command_queue->commandBuffer();
     MTL::RenderPassDescriptor* rpd = view->currentRenderPassDescriptor();
     MTL::RenderCommandEncoder* enc = cmd->renderCommandEncoder( rpd );
+    
+    enc->setRenderPipelineState(triangle_pipeline);
+    enc->drawPrimitives(
+        MTL::PrimitiveType::PrimitiveTypeTriangle,
+        NS::UInteger(0),
+        NS::UInteger(3)
+    );
+    
     enc->endEncoding();
     cmd->presentDrawable(view->currentDrawable());
     cmd->commit();
