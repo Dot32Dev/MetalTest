@@ -19,11 +19,12 @@ struct VertexOutput {
 
 VertexOutput vertex vertex_main(
     uint vertex_id [[vertex_id]],
-    device const VertexInput* vertices [[buffer(0)]]
+    device const VertexInput* vertices [[buffer(0)]],
+    constant float4x4& transform [[buffer(1)]]
 ) {
     VertexOutput payload;
     
-    payload.position = float4(vertices[vertex_id].position, 1.0);
+    payload.position = transform * float4(vertices[vertex_id].position, 1.0);
     payload.colour = float3(1.0, 0.2, 0.0);
     
     return payload;

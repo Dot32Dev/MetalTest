@@ -8,6 +8,9 @@
 #ifndef APPLICATION_H
 #define APPLICATION_H
 
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#define GLM_FORCE_LEFT_HANDED
+#include <glm/glm.hpp>
 #include <MetalKit/MetalKit.hpp>
 
 class ViewDelegate : public MTK::ViewDelegate {
@@ -22,6 +25,7 @@ class ViewDelegate : public MTK::ViewDelegate {
         MTL::Buffer* vertex_buffer;
         MTL::Buffer* index_buffer;
         int index_count;
+        glm::mat4 model;
         void buildTriangle();
         void buildQuad();
         MTL::RenderPipelineState* buildShader(

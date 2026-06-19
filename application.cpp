@@ -10,6 +10,8 @@
 #include <fstream>
 #include <sstream>
 #include <simd/simd.h>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 using NS::StringEncoding::UTF8StringEncoding;
 
@@ -144,7 +146,8 @@ bool AppDelegate::applicationShouldTerminateAfterLastWindowClosed(
 
 ViewDelegate::ViewDelegate(MTL::Device* device): 
     MTK::ViewDelegate(), 
-    device(device->retain())
+    device(device->retain()),
+    model(glm::mat4(1.0f))
 {
     command_queue = device->newCommandQueue();
     buildQuad();
@@ -268,6 +271,8 @@ ViewDelegate::~ViewDelegate() {
 }
 
 void ViewDelegate::drawInMTKView(MTK::View* view) {
+    model = glm::rotate(model, 0.01f, glm::vec3(0.0f, 0.0f, 1.0f));
+    
     NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
 
     MTL::CommandBuffer* cmd = command_queue->commandBuffer();
@@ -276,6 +281,7 @@ void ViewDelegate::drawInMTKView(MTK::View* view) {
     
     enc->setRenderPipelineState(pipeline);
     enc->setVertexBuffer(vertex_buffer, 0, 0);
+    enc->setVertexBytes(glm::value_ptr(model), sizeof(simd::float4x4), 1);
     enc->drawIndexedPrimitives(MTL::PrimitiveTypeTriangle,
        NS::UInteger(6),
        MTL::IndexTypeUInt16,
