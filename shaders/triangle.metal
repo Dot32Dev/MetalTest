@@ -12,18 +12,6 @@ struct VertexInput {
     float3 position;
 };
 
-//constant float4 positions[] {
-//    float4(-0.75, -0.75, 0.0, 1.0),
-//    float4(0.75, -0.75, 0.0, 1.0),
-//    float4(0.0, 0.75, 0.0, 1.0)
-//};
-
-constant float3 colours[] {
-    float3(1.0, 0.0, 0.0),
-    float3(0.0, 1.0, 0.0),
-    float3(0.0, 0.0, 1.0)
-};
-
 struct VertexOutput {
     float4 position [[position]];
     float3 colour;
@@ -36,7 +24,7 @@ VertexOutput vertex vertex_main(
     VertexOutput payload;
     
     payload.position = float4(vertices[vertex_id].position, 1.0);
-    payload.colour = colours[vertex_id];
+    payload.colour = float3(1.0, 0.2, 0.0);
     
     return payload;
 }
