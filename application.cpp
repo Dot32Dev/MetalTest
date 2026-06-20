@@ -31,6 +31,9 @@ Application::Application() {
     glfwInitHint(GLFW_COCOA_MENUBAR, GLFW_FALSE);
 
     glfw_window = glfwCreateWindow(800, 600, "MetalTest", nullptr, nullptr);
+    glfwSetWindowUserPointer(glfw_window, this);
+    glfwSetFramebufferSizeCallback(glfw_window, Application::resize);
+    resize(glfw_window, 800, 600);
 
     device = MTL::CreateSystemDefaultDevice();
     layer = CA::MetalLayer::layer()->retain();
@@ -44,7 +47,11 @@ Application::Application() {
         "vertex_main",
         "frag_main"
     );
+    
     model = glm::mat4(1.0f);
+    camera = Camera(glm::vec3(0.0f, 0.0f, -2.0f));
+    view = camera.get_view_matrix();
+    last_frame = 0.0;
 
     window = ((NS::Window*)get_ns_window(glfw_window, layer))->retain();
     
@@ -78,13 +85,51 @@ void Application::run() {
     while (!glfwWindowShouldClose(glfw_window)) {
         glfwPollEvents();
         
-        if (glfwGetKey(glfw_window, GLFW_KEY_RIGHT) == GLFW_PRESS) {
-            model = glm::rotate(model, 0.01f, glm::vec3(0.0f, 0.0f, -1.0f));
-        }
-        if (glfwGetKey(glfw_window, GLFW_KEY_LEFT) == GLFW_PRESS) {
-            model = glm::rotate(model, -0.01f, glm::vec3(0.0f, 0.0f, -1.0f));
+        // Delta time
+        double current_frame = glfwGetTime();
+        double delta_time = current_frame - last_frame;
+        last_frame = current_frame;
+        
+        model = glm::rotate(
+            model,
+            (float)(0.5 * delta_time),
+            glm::vec3(0.0f, 0.0f, -1.0f)
+        );
+        
+        float movement_speed = 3.0 * delta_time;
+        float rot_speed = 1.5 * delta_time;
+
+        if (glfwGetKey(glfw_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+            movement_speed *= 2.0;
         }
         
+        vec3 pos_input = vec3(0.0f, 0.0f, 0.0f);
+        if (glfwGetKey(glfw_window, GLFW_KEY_W) == GLFW_PRESS)
+            pos_input += vec3(0.0f, 0.0f, movement_speed);
+        if (glfwGetKey(glfw_window, GLFW_KEY_S) == GLFW_PRESS)
+            pos_input += vec3(0.0f, 0.0f, -movement_speed);
+        if (glfwGetKey(glfw_window, GLFW_KEY_A) == GLFW_PRESS)
+            pos_input += vec3(-movement_speed, 0.0f, 0.0f);
+        if (glfwGetKey(glfw_window, GLFW_KEY_D) == GLFW_PRESS)
+            pos_input += vec3(movement_speed, 0.0f, 0.0f);
+
+        vec2 dir_input = vec2(0.0f, 0.0f);
+        if (glfwGetKey(glfw_window, GLFW_KEY_UP) == GLFW_PRESS)
+            dir_input += vec2(0.0f, rot_speed);
+        if (glfwGetKey(glfw_window, GLFW_KEY_DOWN) == GLFW_PRESS)
+            dir_input += vec2(0.0f, -rot_speed);
+        if (glfwGetKey(glfw_window, GLFW_KEY_LEFT) == GLFW_PRESS)
+            dir_input += vec2(rot_speed, 0.0f);
+        if (glfwGetKey(glfw_window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+            dir_input += vec2(-rot_speed, 0.0f);
+
+        // Send input to camera
+        camera.pos_input(camera.get_target(), pos_input);
+        camera.dir_input(camera.get_target(), dir_input);
+        
+        view = camera.get_view_matrix();
+        
+        // Render
         NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
         
         drawable = layer->nextDrawable();
@@ -94,8 +139,16 @@ void Application::run() {
         MTL::RenderCommandEncoder* enc = cmd->renderCommandEncoder(rpd);
         
         enc->setRenderPipelineState(pipeline);
+        
         enc->setVertexBuffer(vertex_buffer, 0, 0);
         enc->setVertexBytes(glm::value_ptr(model), sizeof(simd::float4x4), 1);
+        enc->setVertexBytes(glm::value_ptr(view), sizeof(simd::float4x4), 2);
+        enc->setVertexBytes(
+            glm::value_ptr(projection),
+            sizeof(simd::float4x4),
+            3
+        );
+        
         enc->drawIndexedPrimitives(MTL::PrimitiveTypeTriangle,
            NS::UInteger(6),
            MTL::IndexTypeUInt16,
@@ -285,4 +338,20 @@ MTL::RenderPipelineState* Application::buildShader(
     library->release();
     
     return pipeline;
+}
+
+void Application::resize(GLFWwindow* glfw_window, int width, int height) {
+    void* user_pointer = glfwGetWindowUserPointer(glfw_window);
+    Application* app = reinterpret_cast<Application*>(user_pointer);
+    
+    app->layer->setDrawableSize(
+        CGSizeMake(width, height) // (Not retina)
+    );
+    
+    app->projection = glm::perspective(
+        glm::radians(90.0f),
+        (float)width/height,
+        0.2f,
+        1000.0f
+    );
 }

@@ -1,5 +1,5 @@
 //
-//  glfw_adaptor.m
+//  glfw_adaptor.mm
 //  MetalTest
 //
 //  Created by Dot32  on 20/6/2026.

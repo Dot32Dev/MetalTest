@@ -12,16 +12,22 @@
 #define GLM_FORCE_LEFT_HANDED
 #include <glm/glm.hpp>
 #include <MetalKit/MetalKit.hpp>
-
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
+#include "camera.h"
 
 class Application {
     public:
+        /// @brief Constructor for Application
         Application();
+        
+        /// @brief Destructor for Application
         ~Application();
+
+        /// @brief Run the application
         void run();
     private:
+        Camera camera;
         GLFWwindow* glfw_window;
         MTL::Device* device;
         CA::MetalLayer* layer;
@@ -34,7 +40,10 @@ class Application {
         MTL::Buffer* vertex_buffer;
         MTL::Buffer* index_buffer;
         int index_count;
+        double last_frame;
         glm::mat4 model;
+        glm::mat4 view;
+        glm::mat4 projection;
         void buildTriangle();
         void buildQuad();
         MTL::RenderPipelineState* buildShader(
@@ -43,6 +52,7 @@ class Application {
             std::string frag_name
         );
         NS::Menu* createMenuBar();
+        static void resize(GLFWwindow* glfw_window, int width, int height);
 };
 
 #endif
