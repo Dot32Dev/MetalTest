@@ -139,6 +139,7 @@ void Application::run() {
         MTL::RenderCommandEncoder* enc = cmd->renderCommandEncoder(rpd);
         
         enc->setRenderPipelineState(pipeline);
+        enc->setTriangleFillMode(MTL::TriangleFillModeLines);
         
         enc->setVertexBuffer(vertex_buffer, 0, 0);
         enc->setVertexBytes(glm::value_ptr(model), sizeof(simd::float4x4), 1);
