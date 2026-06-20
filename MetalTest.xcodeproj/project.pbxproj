@@ -14,6 +14,7 @@
 		C1D25A552FDFD37C001F1756 /* application.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1D25A532FDFD37A001F1756 /* application.cpp */; };
 		C1D25A602FE519EB001F1756 /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1D25A5F2FE519EB001F1756 /* camera.cpp */; };
 		C1D25A642FE64F83001F1756 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1D25A632FE64F83001F1756 /* IOKit.framework */; };
+		C1D25A682FE66537001F1756 /* glfw_adaptor.mm in Sources */ = {isa = PBXBuildFile; fileRef = C1D25A672FE66537001F1756 /* glfw_adaptor.mm */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -39,6 +40,8 @@
 		C1D25A5E2FE519EB001F1756 /* camera.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = camera.hpp; sourceTree = "<group>"; };
 		C1D25A5F2FE519EB001F1756 /* camera.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
 		C1D25A632FE64F83001F1756 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
+		C1D25A672FE66537001F1756 /* glfw_adaptor.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = glfw_adaptor.mm; sourceTree = "<group>"; };
+		C1D25A692FE66583001F1756 /* glfw_adaptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = glfw_adaptor.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -67,6 +70,8 @@
 		C1D2575F2FDF1BBF001F1756 = {
 			isa = PBXGroup;
 			children = (
+				C1D25A692FE66583001F1756 /* glfw_adaptor.h */,
+				C1D25A672FE66537001F1756 /* glfw_adaptor.mm */,
 				C1D25A5E2FE519EB001F1756 /* camera.hpp */,
 				C1D25A5F2FE519EB001F1756 /* camera.cpp */,
 				C1D25A582FE4DDF6001F1756 /* shaders */,
@@ -164,6 +169,7 @@
 				C1D25A602FE519EB001F1756 /* camera.cpp in Sources */,
 				C1D25A552FDFD37C001F1756 /* application.cpp in Sources */,
 				C1D259262FDF1CED001F1756 /* main.cpp in Sources */,
+				C1D25A682FE66537001F1756 /* glfw_adaptor.mm in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
