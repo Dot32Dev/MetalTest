@@ -12,6 +12,8 @@
 		C1D25A4F2FDF2116001F1756 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1D25A4E2FDF2116001F1756 /* AppKit.framework */; };
 		C1D25A512FDF2124001F1756 /* Metal.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1D25A502FDF2124001F1756 /* Metal.framework */; };
 		C1D25A552FDFD37C001F1756 /* application.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1D25A532FDFD37A001F1756 /* application.cpp */; };
+		C1D25A602FE519EB001F1756 /* camera.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1D25A5F2FE519EB001F1756 /* camera.cpp */; };
+		C1D25A642FE64F83001F1756 /* IOKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1D25A632FE64F83001F1756 /* IOKit.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -34,14 +36,12 @@
 		C1D25A502FDF2124001F1756 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		C1D25A522FDFD36D001F1756 /* application.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = application.h; sourceTree = "<group>"; };
 		C1D25A532FDFD37A001F1756 /* application.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = application.cpp; sourceTree = "<group>"; };
+		C1D25A5E2FE519EB001F1756 /* camera.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = camera.hpp; sourceTree = "<group>"; };
+		C1D25A5F2FE519EB001F1756 /* camera.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
+		C1D25A632FE64F83001F1756 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
-		C1D2576A2FDF1BBF001F1756 /* MetalTest */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = MetalTest;
-			sourceTree = "<group>";
-		};
 		C1D25A582FE4DDF6001F1756 /* shaders */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = shaders;
@@ -57,6 +57,7 @@
 				C1D25A512FDF2124001F1756 /* Metal.framework in Frameworks */,
 				C1D25A4F2FDF2116001F1756 /* AppKit.framework in Frameworks */,
 				C1D25A4D2FDF210F001F1756 /* MetalKit.framework in Frameworks */,
+				C1D25A642FE64F83001F1756 /* IOKit.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -66,11 +67,12 @@
 		C1D2575F2FDF1BBF001F1756 = {
 			isa = PBXGroup;
 			children = (
+				C1D25A5E2FE519EB001F1756 /* camera.hpp */,
+				C1D25A5F2FE519EB001F1756 /* camera.cpp */,
 				C1D25A582FE4DDF6001F1756 /* shaders */,
 				C1D25A522FDFD36D001F1756 /* application.h */,
 				C1D25A532FDFD37A001F1756 /* application.cpp */,
 				C1D259252FDF1CED001F1756 /* main.cpp */,
-				C1D2576A2FDF1BBF001F1756 /* MetalTest */,
 				C1D25A4B2FDF210E001F1756 /* Frameworks */,
 				C1D257692FDF1BBF001F1756 /* Products */,
 			);
@@ -87,6 +89,7 @@
 		C1D25A4B2FDF210E001F1756 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				C1D25A632FE64F83001F1756 /* IOKit.framework */,
 				C1D25A502FDF2124001F1756 /* Metal.framework */,
 				C1D25A4E2FDF2116001F1756 /* AppKit.framework */,
 				C1D25A4C2FDF210F001F1756 /* MetalKit.framework */,
@@ -110,7 +113,6 @@
 			dependencies = (
 			);
 			fileSystemSynchronizedGroups = (
-				C1D2576A2FDF1BBF001F1756 /* MetalTest */,
 				C1D25A582FE4DDF6001F1756 /* shaders */,
 			);
 			name = MetalTest;
@@ -159,6 +161,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C1D25A602FE519EB001F1756 /* camera.cpp in Sources */,
 				C1D25A552FDFD37C001F1756 /* application.cpp in Sources */,
 				C1D259262FDF1CED001F1756 /* main.cpp in Sources */,
 			);
@@ -290,7 +293,14 @@
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(PROJECT_DIR)/third_party/metal-cpp",
 					"$(PROJECT_DIR)/third_party",
+					"$(PROJECT_DIR)/third_party/glfw/include",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/third_party/glfw/lib-arm64",
+				);
+				OTHER_LDFLAGS = "-lglfw3";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
@@ -305,7 +315,14 @@
 				"HEADER_SEARCH_PATHS[arch=*]" = (
 					"$(PROJECT_DIR)/third_party/metal-cpp",
 					"$(PROJECT_DIR)/third_party",
+					"$(PROJECT_DIR)/third_party/glfw/include",
 				);
+				LIBRARY_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(PROJECT_DIR)",
+					"$(PROJECT_DIR)/third_party/glfw/lib-arm64",
+				);
+				OTHER_LDFLAGS = "-lglfw3";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 6.0;
 			};

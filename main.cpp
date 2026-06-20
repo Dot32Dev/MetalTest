@@ -15,16 +15,33 @@
 #include <Metal/Metal.hpp>
 #include <AppKit/AppKit.hpp>
 #include <MetalKit/MetalKit.hpp>
+//
+//int main(int argc, const char * argv[]) {
+//    NS::AutoreleasePool* autoreleasePool = NS::AutoreleasePool::alloc()->init();
+//    
+//    AppDelegate delegate;
+//    
+//    NS::Application* app = NS::Application::sharedApplication();
+//    app->setDelegate(&delegate);
+//    app->run();
+//    
+//    autoreleasePool->release();
+//    return 0;
+//}
 
-int main(int argc, const char * argv[]) {
-    NS::AutoreleasePool* autoreleasePool = NS::AutoreleasePool::alloc()->init();
-    
-    AppDelegate delegate;
-    
-    NS::Application* app = NS::Application::sharedApplication();
-    app->setDelegate(&delegate);
-    app->run();
-    
-    autoreleasePool->release();
-    return 0;
+#include <GLFW/glfw3.h>
+
+int main() {
+    if (!glfwInit())
+        return -1;
+
+    GLFWwindow* window =
+        glfwCreateWindow(800, 600, "Hello", nullptr, nullptr);
+
+    while (!glfwWindowShouldClose(window)) {
+        glfwPollEvents();
+    }
+
+    glfwDestroyWindow(window);
+    glfwTerminate();
 }
