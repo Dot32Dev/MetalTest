@@ -37,7 +37,7 @@
 		C1D25A502FDF2124001F1756 /* Metal.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Metal.framework; path = System/Library/Frameworks/Metal.framework; sourceTree = SDKROOT; };
 		C1D25A522FDFD36D001F1756 /* application.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = application.h; sourceTree = "<group>"; };
 		C1D25A532FDFD37A001F1756 /* application.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = application.cpp; sourceTree = "<group>"; };
-		C1D25A5E2FE519EB001F1756 /* camera.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = camera.hpp; sourceTree = "<group>"; };
+		C1D25A5E2FE519EB001F1756 /* camera.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = camera.h; sourceTree = "<group>"; };
 		C1D25A5F2FE519EB001F1756 /* camera.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = camera.cpp; sourceTree = "<group>"; };
 		C1D25A632FE64F83001F1756 /* IOKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = IOKit.framework; path = System/Library/Frameworks/IOKit.framework; sourceTree = SDKROOT; };
 		C1D25A672FE66537001F1756 /* glfw_adaptor.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = glfw_adaptor.mm; sourceTree = "<group>"; };
@@ -72,7 +72,7 @@
 			children = (
 				C1D25A692FE66583001F1756 /* glfw_adaptor.h */,
 				C1D25A672FE66537001F1756 /* glfw_adaptor.mm */,
-				C1D25A5E2FE519EB001F1756 /* camera.hpp */,
+				C1D25A5E2FE519EB001F1756 /* camera.h */,
 				C1D25A5F2FE519EB001F1756 /* camera.cpp */,
 				C1D25A582FE4DDF6001F1756 /* shaders */,
 				C1D25A522FDFD36D001F1756 /* application.h */,
