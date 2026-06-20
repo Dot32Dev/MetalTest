@@ -15,6 +15,10 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 using NS::StringEncoding::UTF8StringEncoding;
+using std::string;
+using std::vector;
+using std::ifstream;
+using std::ios;
 
 // The layout of each vertex
 struct Vertex {
@@ -41,7 +45,8 @@ Application::Application() {
     layer->setPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB);
 
     command_queue = device->newCommandQueue()->retain();
-    buildQuad();
+//    buildQuad();
+    loadTerrain("height128.raw", 128);
     pipeline = buildShader(
         "shaders/triangle.metal",
         "vertex_main",
@@ -49,7 +54,7 @@ Application::Application() {
     );
     
     model = glm::mat4(1.0f);
-    camera = Camera(glm::vec3(0.0f, 0.0f, -2.0f));
+    camera = Camera(glm::vec3(0.0f, 100.0f, -2.0f));
     view = camera.get_view_matrix();
     last_frame = 0.0;
 
@@ -90,13 +95,13 @@ void Application::run() {
         double delta_time = current_frame - last_frame;
         last_frame = current_frame;
         
-        model = glm::rotate(
-            model,
-            (float)(0.5 * delta_time),
-            glm::vec3(0.0f, 0.0f, -1.0f)
-        );
+//        model = glm::rotate(
+//            model,
+//            (float)(0.5 * delta_time),
+//            glm::vec3(0.0f, 0.0f, -1.0f)
+//        );
         
-        float movement_speed = 3.0 * delta_time;
+        float movement_speed = 15.0 * delta_time;
         float rot_speed = 1.5 * delta_time;
 
         if (glfwGetKey(glfw_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
@@ -151,7 +156,7 @@ void Application::run() {
         );
         
         enc->drawIndexedPrimitives(MTL::PrimitiveTypeTriangle,
-           NS::UInteger(6),
+           NS::UInteger(index_count),
            MTL::IndexTypeUInt16,
            index_buffer,
            NS::UInteger(0),
@@ -237,6 +242,72 @@ NS::Menu* Application::createMenuBar() {
     return mainMenu->autorelease();
 }
 
+void Application::loadTerrain(string file_name, int size) {
+    ifstream infile(file_name, ios::binary);
+    if (!infile) return;
+
+    vector<unsigned char> terrain_data = vector<unsigned char>();
+
+    // Get length of file
+    infile.seekg(0, ios::end);
+    int length = (int)infile.tellg();
+
+    // Read data as block
+    infile.seekg(0, ios::beg);
+    terrain_data.resize(length);
+    infile.read(reinterpret_cast<char*>(terrain_data.data()), length);
+    infile.close();
+    
+    vector<Vertex> vert_vector = vector<Vertex>();
+    vector<ushort> index_vector = vector<ushort>();
+    
+    for (int z = 0; z < size; z++) {
+        for (int x = 0; x < size; x++) {
+            int y = terrain_data[z * size + x];
+            vert_vector.push_back({
+                {(float)(x - size / 2), (float)(y)*0.5f, (float)(z - size / 2)}
+            });
+        }
+    }
+
+    for (int z = 0; z < size-1; z++) {
+        for (int x = 0; x < size-1; x++) {
+            // Triangle one
+            index_vector.push_back(z * size + x); // Top left of tile
+            index_vector.push_back(z * size + x + 1); // Top right of tile
+            index_vector.push_back((z + 1) * size + x); // Bottom left of tile
+
+            // Triangle two
+            index_vector.push_back(z * size + x + 1); // Top right of tile
+            index_vector.push_back((z + 1) * size + x + 1); // Bottom right
+            index_vector.push_back((z + 1) * size + x); // Bottom left of tile
+        }
+    }
+    
+    index_count = (int)index_vector.size();
+    
+    vertex_buffer = device->newBuffer(
+        vert_vector.size() * sizeof(Vertex),
+        MTL::ResourceStorageModeManaged
+    );
+    memcpy(
+        vertex_buffer->contents(),
+        vert_vector.data(),
+        vert_vector.size() * sizeof(Vertex)
+    );
+    vertex_buffer->didModifyRange(NS::Range(0, vert_vector.size()));
+      
+    index_buffer = device->newBuffer(
+        index_count * sizeof(ushort),
+        MTL::ResourceStorageModeManaged
+    );
+    memcpy(index_buffer->contents(),
+        index_vector.data(),
+        index_count * sizeof(ushort)
+    );
+    index_buffer->didModifyRange(NS::Range(0, index_count));
+}
+
 void Application::buildTriangle() {
     Vertex vertices[] = {
         {{-0.75, -0.75, 0.0}},
@@ -258,7 +329,7 @@ void Application::buildTriangle() {
         index_count * sizeof(ushort),
         MTL::ResourceStorageModeManaged
     );
-    memcpy(index_buffer->contents(), indices, index_count * sizeof(Vertex));
+    memcpy(index_buffer->contents(), indices, index_count * sizeof(ushort));
     index_buffer->didModifyRange(NS::Range(0, index_count));
 }
 
@@ -283,7 +354,7 @@ void Application::buildQuad() {
         index_count * sizeof(ushort),
         MTL::ResourceStorageModeManaged
     );
-    memcpy(index_buffer->contents(), indices, index_count * sizeof(Vertex));
+    memcpy(index_buffer->contents(), indices, index_count * sizeof(ushort));
     index_buffer->didModifyRange(NS::Range(0, index_count));
 }
 

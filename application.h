@@ -44,6 +44,7 @@ class Application {
         glm::mat4 model;
         glm::mat4 view;
         glm::mat4 projection;
+        void loadTerrain(std::string file_name, int size);
         void buildTriangle();
         void buildQuad();
         MTL::RenderPipelineState* buildShader(
