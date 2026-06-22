@@ -13,17 +13,13 @@
 #include <simd/simd.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include "shaders/types.h"
 
 using NS::StringEncoding::UTF8StringEncoding;
 using std::string;
 using std::vector;
 using std::ifstream;
 using std::ios;
-
-// The layout of each vertex
-struct Vertex {
-    simd::float3 pos;
-};
 
 Application::Application() {
     if (!glfwInit()) {
@@ -48,7 +44,6 @@ Application::Application() {
 //    buildQuad();
     loadTerrain("height128.raw", 128);
     pipeline = buildShader(
-        "shaders/triangle.metal",
         "vertex_main",
         "frag_main"
     );
@@ -359,26 +354,12 @@ void Application::buildQuad() {
 }
 
 MTL::RenderPipelineState* Application::buildShader(
-   std::string filename,
    std::string vert_name,
    std::string frag_name
 ) {
-    std::ifstream file;
-    file.open(filename);
-    std::stringstream reader;
-    reader << file.rdbuf();
-    std::string raw_string = reader.str();
-    
-    NS::String* source = NS::String::string(
-        raw_string.c_str(), 
-        UTF8StringEncoding
-    );
-
-    NS::Error* error = nullptr;
-    MTL::CompileOptions* options = nullptr;
-    MTL::Library* library = device->newLibrary(source, options, &error);
+    MTL::Library* library = device->newDefaultLibrary();
     if (!library) {
-        std::cerr << error->localizedDescription()->utf8String() << std::endl;
+        std::cerr << "Shader load error" << std::endl;
     }
 
     MTL::Function* vert_fn = library->newFunction(
@@ -396,6 +377,7 @@ MTL::RenderPipelineState* Application::buildShader(
         MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB
     );
     
+    NS::Error* error = nullptr;
     MTL::RenderPipelineState* pipeline = device->newRenderPipelineState(
         descriptor, 
         &error

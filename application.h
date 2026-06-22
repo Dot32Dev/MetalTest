@@ -48,7 +48,6 @@ class Application {
         void buildTriangle();
         void buildQuad();
         MTL::RenderPipelineState* buildShader(
-            std::string filename,
             std::string vert_name,
             std::string frag_name
         );

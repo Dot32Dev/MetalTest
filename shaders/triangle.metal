@@ -6,28 +6,26 @@
 //
 
 #include <metal_stdlib>
+#include "types.h"
+
 using namespace metal;
 
-struct VertexInput {
-    float3 position;
-};
-
 struct VertexOutput {
-    float4 position [[position]];
+    float4 pos [[position]];
     float3 colour;
 };
 
 VertexOutput vertex vertex_main(
     uint vertex_id [[vertex_id]],
-    device const VertexInput* vertices [[buffer(0)]],
+    device const Vertex* vertices [[buffer(0)]],
     constant float4x4& model [[buffer(1)]],
     constant float4x4& view [[buffer(2)]],
     constant float4x4& projection [[buffer(3)]]
 ) {
     VertexOutput payload;
     
-    payload.position = projection * view * model * float4(
-        vertices[vertex_id].position,
+    payload.pos = projection * view * model * float4(
+        vertices[vertex_id].pos,
         1.0
     );
     

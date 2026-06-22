@@ -306,6 +306,7 @@
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/third_party/glfw/lib-arm64",
 				);
+				"MTL_HEADER_SEARCH_PATHS[sdk=*]" = "$(PROJECT_DIR)/shaders";
 				OTHER_LDFLAGS = "-lglfw3";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
@@ -328,6 +329,7 @@
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/third_party/glfw/lib-arm64",
 				);
+				MTL_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/shaders";
 				OTHER_LDFLAGS = "-lglfw3";
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 6.0;
