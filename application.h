@@ -35,6 +35,7 @@ class Application {
         CA::MetalDrawable* drawable;
         MTL::RenderPassDescriptor* rpd;
         MTL::RenderPassColorAttachmentDescriptor* colour_attachment;
+        MTL::DepthStencilState* depth_stencil_state;
         MTL::CommandQueue* command_queue;
         MTL::RenderPipelineState* pipeline;
         MTL::Buffer* vertex_buffer;

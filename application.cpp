@@ -21,6 +21,10 @@ using std::vector;
 using std::ifstream;
 using std::ios;
 
+// Starting window size
+const int WIN_W = 800;
+const int WIN_H = 600;
+
 Application::Application() {
     if (!glfwInit()) {
         std::cerr << "Could not init GLFW" << std::endl;
@@ -30,10 +34,9 @@ Application::Application() {
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
     glfwInitHint(GLFW_COCOA_MENUBAR, GLFW_FALSE);
 
-    glfw_window = glfwCreateWindow(800, 600, "MetalTest", nullptr, nullptr);
+    glfw_window = glfwCreateWindow(WIN_W, WIN_H, "MetalTest", nullptr, nullptr);
     glfwSetWindowUserPointer(glfw_window, this);
     glfwSetFramebufferSizeCallback(glfw_window, Application::resize);
-    resize(glfw_window, 800, 600);
 
     device = MTL::CreateSystemDefaultDevice();
     layer = CA::MetalLayer::layer()->retain();
@@ -65,6 +68,20 @@ Application::Application() {
     colour_attachment->setLoadAction(MTL::LoadAction::LoadActionClear);
     colour_attachment->setClearColor(MTL::ClearColor(0.0f, 0.0f, 0.0f, 1.0));
     colour_attachment->setStoreAction(MTL::StoreAction::StoreActionStore);
+    
+    MTL::RenderPassDepthAttachmentDescriptor* depth_attachment;
+    depth_attachment = rpd->depthAttachment();
+    depth_attachment->setClearDepth(1.0);
+    
+    resize(glfw_window, WIN_W, WIN_H);
+    
+    MTL::DepthStencilDescriptor* depth_stencil_desc;
+    depth_stencil_desc = MTL::DepthStencilDescriptor::alloc()->init();
+    depth_stencil_desc->setDepthWriteEnabled(true);
+    depth_stencil_desc->setDepthCompareFunction(
+        MTL::CompareFunction::CompareFunctionLess
+    );
+    depth_stencil_state = device->newDepthStencilState(depth_stencil_desc);
 }
 
 Application::~Application() {
@@ -139,6 +156,7 @@ void Application::run() {
         MTL::RenderCommandEncoder* enc = cmd->renderCommandEncoder(rpd);
         
         enc->setRenderPipelineState(pipeline);
+        enc->setDepthStencilState(depth_stencil_state);
         enc->setTriangleFillMode(MTL::TriangleFillModeLines);
         
         enc->setVertexBuffer(vertex_buffer, 0, 0);
@@ -376,6 +394,9 @@ MTL::RenderPipelineState* Application::buildShader(
     descriptor->colorAttachments()->object(0)->setPixelFormat(
         MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB
     );
+    descriptor->setDepthAttachmentPixelFormat(
+        MTL::PixelFormat::PixelFormatDepth32Float
+    );
     
     NS::Error* error = nullptr;
     MTL::RenderPipelineState* pipeline = device->newRenderPipelineState(
@@ -408,4 +429,20 @@ void Application::resize(GLFWwindow* glfw_window, int width, int height) {
         0.2f,
         1000.0f
     );
+    
+    MTL::TextureDescriptor* depth_texture_desc;
+    depth_texture_desc = MTL::TextureDescriptor::texture2DDescriptor(
+        MTL::PixelFormat::PixelFormatDepth32Float,
+        width,
+        height,
+        false
+    );
+
+    depth_texture_desc->setUsage(MTL::TextureUsageRenderTarget);
+    depth_texture_desc->setStorageMode(MTL::StorageModePrivate);
+    
+    MTL::RenderPassDepthAttachmentDescriptor* depth_attachment;
+    depth_attachment = app->rpd->depthAttachment();
+    depth_attachment->setClearDepth(1.0);
+    depth_attachment->setTexture(app->device->newTexture(depth_texture_desc));
 }
