@@ -10,9 +10,10 @@
 
 #define GLM_FORCE_DEPTH_ZERO_TO_ONE
 #define GLM_FORCE_LEFT_HANDED
+#define GLFW_INCLUDE_NONE
+
 #include <glm/glm.hpp>
 #include <MetalKit/MetalKit.hpp>
-#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include "camera.h"
 
@@ -40,6 +41,8 @@ class Application {
         MTL::RenderPipelineState* pipeline;
         MTL::Buffer* vertex_buffer;
         MTL::Buffer* index_buffer;
+        MTL::Texture* texture;
+        MTL::SamplerState* sampler;
         int index_count;
         double last_frame;
         glm::mat4 model;

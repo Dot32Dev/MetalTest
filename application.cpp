@@ -5,15 +5,18 @@
 //  Created by Dot32  on 15/6/2026.
 //
 
+#define STB_IMAGE_IMPLEMENTATION
+
 #include "application.h"
 #include "glfw_adaptor.h"
+#include "shaders/types.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <simd/simd.h>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
-#include "shaders/types.h"
+#include <stb_image.h>
 
 using NS::StringEncoding::UTF8StringEncoding;
 using std::string;
@@ -82,6 +85,39 @@ Application::Application() {
         MTL::CompareFunction::CompareFunctionLess
     );
     depth_stencil_state = device->newDepthStencilState(depth_stencil_desc);
+    
+    int img_w, img_h, img_chann;
+    unsigned char *data = stbi_load(
+        "rocky_terrain_03_diff_4k.jpg",
+        &img_w,
+        &img_h,
+        &img_chann,
+        STBI_rgb_alpha
+    );
+    
+    MTL::TextureDescriptor* texture_desc;
+    texture_desc = MTL::TextureDescriptor::texture2DDescriptor(
+        MTL::PixelFormat::PixelFormatRGBA8Unorm,
+        img_w,
+        img_h,
+        false
+    );
+    texture_desc->setUsage(MTL::TextureUsageRenderTarget);
+    texture_desc->setStorageMode(MTL::StorageModeManaged);
+    texture_desc->setUsage(MTL::TextureUsageShaderRead);
+    texture = device->newTexture(texture_desc);
+    MTL::Region copy_region = MTL::Region::Make2D(0, 0, img_w, img_h);
+    texture->replaceRegion(copy_region, 0, data, img_w * 4);
+    stbi_image_free(data);
+    
+    MTL::SamplerDescriptor* sampler_desc;
+    sampler_desc = MTL::SamplerDescriptor::alloc()->init();
+    sampler_desc->setMinFilter(MTL::SamplerMinMagFilterNearest);
+    sampler_desc->setMagFilter(MTL::SamplerMinMagFilterLinear);
+    sampler_desc->setMipFilter(MTL::SamplerMipFilterNearest);
+    sampler_desc->setSAddressMode(MTL::SamplerAddressModeMirrorRepeat);
+    sampler_desc->setTAddressMode(MTL::SamplerAddressModeMirrorRepeat);
+    sampler = device->newSamplerState(sampler_desc);
 }
 
 Application::~Application() {
@@ -193,7 +229,7 @@ void Application::loadTerrain(string file_name, int size) {
             int y = terrain_data[z * size + x];
             vert_vector.push_back({
                 {(float)(x - size / 2), (float)(y)*0.5f, (float)(z - size / 2)},
-                {(float)x / size, (float)z / size}
+                {((float)x / size) * 8.0f, ((float)z / size) * 8.0f}
             });
         }
     }
@@ -428,6 +464,8 @@ void Application::run() {
         enc->setVertexBuffer(vertex_buffer, 0, 0);
         enc->setVertexBytes(glm::value_ptr(model), sizeof(simd::float4x4), 1);
         enc->setVertexBytes(glm::value_ptr(view), sizeof(simd::float4x4), 2);
+        enc->setFragmentTexture(texture, 0);
+        enc->setFragmentSamplerState(sampler, 0);
         enc->setVertexBytes(
             glm::value_ptr(projection),
             sizeof(simd::float4x4),
