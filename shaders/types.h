@@ -11,13 +11,16 @@
 #ifdef __METAL_VERSION__
     #include <metal_stdlib>
     using metal::float3;
+    using metal::float2;
 #else
     #include <simd/simd.h>
     using simd::float3;
+    using simd::float2;
 #endif
 
 struct Vertex {
     float3 pos;
+    float2 tex_coord;
 };
 
 #endif /* types_h */

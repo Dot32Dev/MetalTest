@@ -29,7 +29,8 @@ VertexOutput vertex vertex_main(
         1.0
     );
     
-    payload.colour = float3(1.0, 0.2, 0.0);
+//    payload.colour = float3(1.0, 0.2, 0.0);
+    payload.colour = float3(vertices[vertex_id].tex_coord, 0.0);
     
     return payload;
 }

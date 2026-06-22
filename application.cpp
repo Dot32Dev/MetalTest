@@ -278,7 +278,8 @@ void Application::loadTerrain(string file_name, int size) {
         for (int x = 0; x < size; x++) {
             int y = terrain_data[z * size + x];
             vert_vector.push_back({
-                {(float)(x - size / 2), (float)(y)*0.5f, (float)(z - size / 2)}
+                {(float)(x - size / 2), (float)(y)*0.5f, (float)(z - size / 2)},
+                {(float)x / size, (float)z / size}
             });
         }
     }
@@ -308,7 +309,9 @@ void Application::loadTerrain(string file_name, int size) {
         vert_vector.data(),
         vert_vector.size() * sizeof(Vertex)
     );
-    vertex_buffer->didModifyRange(NS::Range(0, vert_vector.size()));
+    vertex_buffer->didModifyRange(
+        NS::Range(0, vert_vector.size() * sizeof(Vertex))
+    );
       
     index_buffer = device->newBuffer(
         index_count * sizeof(ushort),
@@ -318,7 +321,7 @@ void Application::loadTerrain(string file_name, int size) {
         index_vector.data(),
         index_count * sizeof(ushort)
     );
-    index_buffer->didModifyRange(NS::Range(0, index_count));
+    index_buffer->didModifyRange(NS::Range(0, index_count * sizeof(ushort)));
 }
 
 void Application::buildTriangle() {
@@ -336,14 +339,14 @@ void Application::buildTriangle() {
     );
     
     memcpy(vertex_buffer->contents(), vertices, 3 * sizeof(Vertex));
-    vertex_buffer->didModifyRange(NS::Range(0, 3));
+    vertex_buffer->didModifyRange(NS::Range(0, 3 * sizeof(Vertex)));
     
     index_buffer = device->newBuffer(
         index_count * sizeof(ushort),
         MTL::ResourceStorageModeManaged
     );
     memcpy(index_buffer->contents(), indices, index_count * sizeof(ushort));
-    index_buffer->didModifyRange(NS::Range(0, index_count));
+    index_buffer->didModifyRange(NS::Range(0, index_count * sizeof(ushort)));
 }
 
 void Application::buildQuad() {
@@ -361,14 +364,14 @@ void Application::buildQuad() {
         MTL::ResourceStorageModeManaged
     );
     memcpy(vertex_buffer->contents(), vertices, 4 * sizeof(Vertex));
-    vertex_buffer->didModifyRange(NS::Range(0, 4));
+    vertex_buffer->didModifyRange(NS::Range(0, 4  * sizeof(Vertex)));
     
     index_buffer = device->newBuffer(
         index_count * sizeof(ushort),
         MTL::ResourceStorageModeManaged
     );
     memcpy(index_buffer->contents(), indices, index_count * sizeof(ushort));
-    index_buffer->didModifyRange(NS::Range(0, index_count));
+    index_buffer->didModifyRange(NS::Range(0, index_count * sizeof(ushort)));
 }
 
 MTL::RenderPipelineState* Application::buildShader(
