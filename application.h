@@ -48,6 +48,7 @@ class Application {
         glm::mat4 model;
         glm::mat4 view;
         glm::mat4 projection;
+        bool wireframe;
         void loadTerrain(std::string file_name, int size);
         void buildTriangle();
         void buildQuad();
@@ -57,6 +58,13 @@ class Application {
         );
         NS::Menu* createMenuBar();
         static void resize(GLFWwindow* glfw_window, int width, int height);
+        static void key_callback(
+            GLFWwindow* glfw_window,
+            int key,
+            int scancode,
+            int action,
+            int mods
+        );
 };
 
 #endif

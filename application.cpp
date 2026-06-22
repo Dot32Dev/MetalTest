@@ -40,6 +40,7 @@ Application::Application() {
     glfw_window = glfwCreateWindow(WIN_W, WIN_H, "MetalTest", nullptr, nullptr);
     glfwSetWindowUserPointer(glfw_window, this);
     glfwSetFramebufferSizeCallback(glfw_window, Application::resize);
+    glfwSetKeyCallback(glfw_window, key_callback);
 
     device = MTL::CreateSystemDefaultDevice();
     layer = CA::MetalLayer::layer()->retain();
@@ -58,6 +59,7 @@ Application::Application() {
     camera = Camera(glm::vec3(0.0f, 100.0f, -2.0f));
     view = camera.get_view_matrix();
     last_frame = 0.0;
+    wireframe = false;
 
     // Steal the underlying NS::Window from GLFW
     window = ((NS::Window*)get_ns_window(glfw_window, layer))->retain();
@@ -418,6 +420,21 @@ void Application::resize(GLFWwindow* glfw_window, int width, int height) {
     depth_attachment->setTexture(app->device->newTexture(depth_texture_desc));
 }
 
+void Application::key_callback(
+    GLFWwindow* glfw_window,
+    int key,
+    int scancode,
+    int action,
+    int mods
+) {
+    void* user_pointer = glfwGetWindowUserPointer(glfw_window);
+    Application* app = reinterpret_cast<Application*>(user_pointer);
+    
+    if (key == GLFW_KEY_C && action == GLFW_PRESS) {
+        app->wireframe = !app->wireframe;
+    }
+}
+
 void Application::run() {
     while (!glfwWindowShouldClose(glfw_window)) {
         glfwPollEvents();
@@ -436,7 +453,7 @@ void Application::run() {
         float movement_speed = 15.0 * delta_time;
         float rot_speed = 1.5 * delta_time;
 
-        if (glfwGetKey(glfw_window, GLFW_KEY_X) == GLFW_PRESS) {
+        if (glfwGetKey(glfw_window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS) {
             movement_speed *= 2.0;
         }
         
@@ -477,7 +494,7 @@ void Application::run() {
         
         enc->setRenderPipelineState(pipeline);
         enc->setDepthStencilState(depth_stencil_state);
-//        enc->setTriangleFillMode(MTL::TriangleFillModeLines);
+        if (wireframe) enc->setTriangleFillMode(MTL::TriangleFillModeLines);
         
         enc->setVertexBuffer(vertex_buffer, 0, 0);
         enc->setVertexBytes(glm::value_ptr(model), sizeof(simd::float4x4), 1);
