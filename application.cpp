@@ -47,18 +47,19 @@ Application::Application() {
     layer->setPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB);
 
     command_queue = device->newCommandQueue()->retain();
-//    buildQuad();
     loadTerrain("height128.raw", 128);
     pipeline = buildShader(
         "vertex_main",
         "frag_main"
     );
     
+    // Update-loop variables
     model = glm::mat4(1.0f);
     camera = Camera(glm::vec3(0.0f, 100.0f, -2.0f));
     view = camera.get_view_matrix();
     last_frame = 0.0;
 
+    // Steal the underlying NS::Window from GLFW
     window = ((NS::Window*)get_ns_window(glfw_window, layer))->retain();
     
     NS::Menu* menu = createMenuBar();
@@ -66,17 +67,20 @@ Application::Application() {
     app->setMainMenu(menu);
     menu->release();
 
+    // Most of the render pass descriptor can be defined once, only the colour
+    // attachment's texture has to be set every frame.
     rpd = MTL::RenderPassDescriptor::alloc()->init();
     colour_attachment = rpd->colorAttachments()->object(0);
     colour_attachment->setLoadAction(MTL::LoadAction::LoadActionClear);
     colour_attachment->setClearColor(MTL::ClearColor(0.0f, 0.0f, 0.0f, 1.0));
     colour_attachment->setStoreAction(MTL::StoreAction::StoreActionStore);
     
+    // Depth
     MTL::RenderPassDepthAttachmentDescriptor* depth_attachment;
     depth_attachment = rpd->depthAttachment();
     depth_attachment->setClearDepth(1.0);
     
-    resize(glfw_window, WIN_W, WIN_H);
+    resize(glfw_window, WIN_W, WIN_H); // Depth texture must resize with screen
     
     MTL::DepthStencilDescriptor* depth_stencil_desc;
     depth_stencil_desc = MTL::DepthStencilDescriptor::alloc()->init();
@@ -86,6 +90,7 @@ Application::Application() {
     );
     depth_stencil_state = device->newDepthStencilState(depth_stencil_desc);
     
+    // Texture
     int img_w, img_h, img_chann;
     unsigned char *data = stbi_load(
         "rocky_terrain_03_diff_4k.jpg",
@@ -105,18 +110,30 @@ Application::Application() {
     texture_desc->setUsage(MTL::TextureUsageRenderTarget);
     texture_desc->setStorageMode(MTL::StorageModeManaged);
     texture_desc->setUsage(MTL::TextureUsageShaderRead);
+    texture_desc->setMipmapLevelCount(8);
     texture = device->newTexture(texture_desc);
     MTL::Region copy_region = MTL::Region::Make2D(0, 0, img_w, img_h);
     texture->replaceRegion(copy_region, 0, data, img_w * 4);
     stbi_image_free(data);
     
+    // Generate mipmaps
+    NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
+    MTL::CommandBuffer* cmd = command_queue->commandBuffer();
+    MTL::BlitCommandEncoder* blit_enc = cmd->blitCommandEncoder();
+    blit_enc->generateMipmaps(texture);
+    blit_enc->endEncoding();
+    cmd->commit();
+    pool->release();
+    
+    // Sampler
     MTL::SamplerDescriptor* sampler_desc;
     sampler_desc = MTL::SamplerDescriptor::alloc()->init();
     sampler_desc->setMinFilter(MTL::SamplerMinMagFilterNearest);
     sampler_desc->setMagFilter(MTL::SamplerMinMagFilterLinear);
     sampler_desc->setMipFilter(MTL::SamplerMipFilterNearest);
-    sampler_desc->setSAddressMode(MTL::SamplerAddressModeMirrorRepeat);
-    sampler_desc->setTAddressMode(MTL::SamplerAddressModeMirrorRepeat);
+    sampler_desc->setMaxAnisotropy(4);
+    sampler_desc->setSAddressMode(MTL::SamplerAddressModeRepeat);
+    sampler_desc->setTAddressMode(MTL::SamplerAddressModeRepeat);
     sampler = device->newSamplerState(sampler_desc);
 }
 
@@ -372,10 +389,10 @@ void Application::resize(GLFWwindow* glfw_window, int width, int height) {
     void* user_pointer = glfwGetWindowUserPointer(glfw_window);
     Application* app = reinterpret_cast<Application*>(user_pointer);
     
-    app->layer->setDrawableSize(
-        CGSizeMake(width, height) // (Not retina)
-    );
+    // Resize displayed texture
+    app->layer->setDrawableSize(CGSizeMake(width, height));
     
+    // Update the projection with the new ratio
     app->projection = glm::perspective(
         glm::radians(90.0f),
         (float)width/height,
@@ -383,6 +400,7 @@ void Application::resize(GLFWwindow* glfw_window, int width, int height) {
         1000.0f
     );
     
+    // Depth
     MTL::TextureDescriptor* depth_texture_desc;
     depth_texture_desc = MTL::TextureDescriptor::texture2DDescriptor(
         MTL::PixelFormat::PixelFormatDepth32Float,
