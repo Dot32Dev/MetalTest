@@ -98,92 +98,6 @@ Application::~Application() {
     glfwTerminate();
 }
 
-void Application::run() {
-    while (!glfwWindowShouldClose(glfw_window)) {
-        glfwPollEvents();
-        
-        // Delta time
-        double current_frame = glfwGetTime();
-        double delta_time = current_frame - last_frame;
-        last_frame = current_frame;
-        
-//        model = glm::rotate(
-//            model,
-//            (float)(0.5 * delta_time),
-//            glm::vec3(0.0f, 0.0f, -1.0f)
-//        );
-        
-        float movement_speed = 15.0 * delta_time;
-        float rot_speed = 1.5 * delta_time;
-
-        if (glfwGetKey(glfw_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-            movement_speed *= 2.0;
-        }
-        
-        vec3 pos_input = vec3(0.0f, 0.0f, 0.0f);
-        if (glfwGetKey(glfw_window, GLFW_KEY_W) == GLFW_PRESS)
-            pos_input += vec3(0.0f, 0.0f, movement_speed);
-        if (glfwGetKey(glfw_window, GLFW_KEY_S) == GLFW_PRESS)
-            pos_input += vec3(0.0f, 0.0f, -movement_speed);
-        if (glfwGetKey(glfw_window, GLFW_KEY_A) == GLFW_PRESS)
-            pos_input += vec3(-movement_speed, 0.0f, 0.0f);
-        if (glfwGetKey(glfw_window, GLFW_KEY_D) == GLFW_PRESS)
-            pos_input += vec3(movement_speed, 0.0f, 0.0f);
-
-        vec2 dir_input = vec2(0.0f, 0.0f);
-        if (glfwGetKey(glfw_window, GLFW_KEY_UP) == GLFW_PRESS)
-            dir_input += vec2(0.0f, rot_speed);
-        if (glfwGetKey(glfw_window, GLFW_KEY_DOWN) == GLFW_PRESS)
-            dir_input += vec2(0.0f, -rot_speed);
-        if (glfwGetKey(glfw_window, GLFW_KEY_LEFT) == GLFW_PRESS)
-            dir_input += vec2(rot_speed, 0.0f);
-        if (glfwGetKey(glfw_window, GLFW_KEY_RIGHT) == GLFW_PRESS)
-            dir_input += vec2(-rot_speed, 0.0f);
-
-        // Send input to camera
-        camera.pos_input(camera.get_target(), pos_input);
-        camera.dir_input(camera.get_target(), dir_input);
-        
-        view = camera.get_view_matrix();
-        
-        // Render
-        NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
-        
-        drawable = layer->nextDrawable();
-        colour_attachment->setTexture(drawable->texture());
-        
-        MTL::CommandBuffer* cmd = command_queue->commandBuffer();
-        MTL::RenderCommandEncoder* enc = cmd->renderCommandEncoder(rpd);
-        
-        enc->setRenderPipelineState(pipeline);
-        enc->setDepthStencilState(depth_stencil_state);
-        enc->setTriangleFillMode(MTL::TriangleFillModeLines);
-        
-        enc->setVertexBuffer(vertex_buffer, 0, 0);
-        enc->setVertexBytes(glm::value_ptr(model), sizeof(simd::float4x4), 1);
-        enc->setVertexBytes(glm::value_ptr(view), sizeof(simd::float4x4), 2);
-        enc->setVertexBytes(
-            glm::value_ptr(projection),
-            sizeof(simd::float4x4),
-            3
-        );
-        
-        enc->drawIndexedPrimitives(MTL::PrimitiveTypeTriangle,
-           NS::UInteger(index_count),
-           MTL::IndexTypeUInt16,
-           index_buffer,
-           NS::UInteger(0),
-           NS::UInteger(1)
-       );
-        
-        enc->endEncoding();
-        cmd->presentDrawable(drawable);
-        cmd->commit();
-        
-        pool->release();
-    }
-}
-
 NS::Menu* Application::createMenuBar() {
     NS::Menu* mainMenu = NS::Menu::alloc()->init();
     
@@ -448,4 +362,90 @@ void Application::resize(GLFWwindow* glfw_window, int width, int height) {
     depth_attachment = app->rpd->depthAttachment();
     depth_attachment->setClearDepth(1.0);
     depth_attachment->setTexture(app->device->newTexture(depth_texture_desc));
+}
+
+void Application::run() {
+    while (!glfwWindowShouldClose(glfw_window)) {
+        glfwPollEvents();
+        
+        // Delta time
+        double current_frame = glfwGetTime();
+        double delta_time = current_frame - last_frame;
+        last_frame = current_frame;
+        
+//        model = glm::rotate(
+//            model,
+//            (float)(0.5 * delta_time),
+//            glm::vec3(0.0f, 0.0f, -1.0f)
+//        );
+        
+        float movement_speed = 15.0 * delta_time;
+        float rot_speed = 1.5 * delta_time;
+
+        if (glfwGetKey(glfw_window, GLFW_KEY_X) == GLFW_PRESS) {
+            movement_speed *= 2.0;
+        }
+        
+        vec3 pos_input = vec3(0.0f, 0.0f, 0.0f);
+        if (glfwGetKey(glfw_window, GLFW_KEY_W) == GLFW_PRESS)
+            pos_input += vec3(0.0f, 0.0f, movement_speed);
+        if (glfwGetKey(glfw_window, GLFW_KEY_S) == GLFW_PRESS)
+            pos_input += vec3(0.0f, 0.0f, -movement_speed);
+        if (glfwGetKey(glfw_window, GLFW_KEY_A) == GLFW_PRESS)
+            pos_input += vec3(-movement_speed, 0.0f, 0.0f);
+        if (glfwGetKey(glfw_window, GLFW_KEY_D) == GLFW_PRESS)
+            pos_input += vec3(movement_speed, 0.0f, 0.0f);
+
+        vec2 dir_input = vec2(0.0f, 0.0f);
+        if (glfwGetKey(glfw_window, GLFW_KEY_UP) == GLFW_PRESS)
+            dir_input += vec2(0.0f, rot_speed);
+        if (glfwGetKey(glfw_window, GLFW_KEY_DOWN) == GLFW_PRESS)
+            dir_input += vec2(0.0f, -rot_speed);
+        if (glfwGetKey(glfw_window, GLFW_KEY_LEFT) == GLFW_PRESS)
+            dir_input += vec2(rot_speed, 0.0f);
+        if (glfwGetKey(glfw_window, GLFW_KEY_RIGHT) == GLFW_PRESS)
+            dir_input += vec2(-rot_speed, 0.0f);
+
+        // Send input to camera
+        camera.pos_input(camera.get_target(), pos_input);
+        camera.dir_input(camera.get_target(), dir_input);
+        
+        view = camera.get_view_matrix();
+        
+        // Render
+        NS::AutoreleasePool* pool = NS::AutoreleasePool::alloc()->init();
+        
+        drawable = layer->nextDrawable();
+        colour_attachment->setTexture(drawable->texture());
+        
+        MTL::CommandBuffer* cmd = command_queue->commandBuffer();
+        MTL::RenderCommandEncoder* enc = cmd->renderCommandEncoder(rpd);
+        
+        enc->setRenderPipelineState(pipeline);
+        enc->setDepthStencilState(depth_stencil_state);
+//        enc->setTriangleFillMode(MTL::TriangleFillModeLines);
+        
+        enc->setVertexBuffer(vertex_buffer, 0, 0);
+        enc->setVertexBytes(glm::value_ptr(model), sizeof(simd::float4x4), 1);
+        enc->setVertexBytes(glm::value_ptr(view), sizeof(simd::float4x4), 2);
+        enc->setVertexBytes(
+            glm::value_ptr(projection),
+            sizeof(simd::float4x4),
+            3
+        );
+        
+        enc->drawIndexedPrimitives(MTL::PrimitiveTypeTriangle,
+           NS::UInteger(index_count),
+           MTL::IndexTypeUInt16,
+           index_buffer,
+           NS::UInteger(0),
+           NS::UInteger(1)
+       );
+        
+        enc->endEncoding();
+        cmd->presentDrawable(drawable);
+        cmd->commit();
+        
+        pool->release();
+    }
 }
