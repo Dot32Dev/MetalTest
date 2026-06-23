@@ -10,6 +10,7 @@
 #include "application.h"
 #include "glfw_adaptor.h"
 #include "shaders/types.h"
+#include "imgui_adaptor.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
@@ -17,6 +18,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <stb_image.h>
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_metal.h>
 
 using NS::StringEncoding::UTF8StringEncoding;
 using std::string;
@@ -46,6 +50,14 @@ Application::Application() {
     layer = CA::MetalLayer::layer()->retain();
     layer->setDevice(device);
     layer->setPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB);
+    
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    io.IniFilename = nullptr;
+    ImGui::StyleColorsDark();
+    ImGui_ImplGlfw_InitForOther(glfw_window, true);
+    imgui_init_metal(device);
 
     command_queue = device->newCommandQueue()->retain();
     loadTerrain("height128.raw", 128);
@@ -82,7 +94,12 @@ Application::Application() {
     depth_attachment = rpd->depthAttachment();
     depth_attachment->setClearDepth(1.0);
     
-    resize(glfw_window, WIN_W, WIN_H); // Depth texture must resize with screen
+    // It makes sense to initialise the depth buffer and projection in the one
+    // place, so we manually call resize. We have to take the screen scaling
+    // into account in order to accurately match the true window size.
+    int true_w, true_h;
+    glfwGetFramebufferSize(glfw_window, &true_w, &true_h);
+    resize(glfw_window, true_w, true_h);
     
     MTL::DepthStencilDescriptor* depth_stencil_desc;
     depth_stencil_desc = MTL::DepthStencilDescriptor::alloc()->init();
@@ -149,6 +166,9 @@ Application::~Application() {
     index_buffer->release();
     pipeline->release();
     
+    imgui_shutdown_metal();
+    ImGui_ImplGlfw_Shutdown();
+    ImGui::DestroyContext();
     glfwDestroyWindow(glfw_window);
     glfwTerminate();
 }
@@ -508,17 +528,34 @@ void Application::run() {
         );
         
         enc->drawIndexedPrimitives(MTL::PrimitiveTypeTriangle,
-           NS::UInteger(index_count),
-           MTL::IndexTypeUInt16,
-           index_buffer,
-           NS::UInteger(0),
-           NS::UInteger(1)
-       );
+            NS::UInteger(index_count),
+            MTL::IndexTypeUInt16,
+            index_buffer,
+            NS::UInteger(0),
+            NS::UInteger(1)
+        );
+        
+        if (wireframe) enc->setTriangleFillMode(MTL::TriangleFillModeFill);
+        
+        imgui_new_frame_metal(rpd);
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+        ImGui::SetNextWindowPos(ImVec2(5, 5), ImGuiCond_FirstUseEver);
+        ImGui::Begin("Debug");
+        ImGui::Text(
+            "FPS: %.1f (%.3f ms)",
+            1.0f / delta_time,
+            delta_time * 1000.0f
+        );
+        ImGui::Checkbox("Wireframe", &wireframe);
+        ImGui::End();
+        ImGui::Render();
+        imgui_render_metal(cmd, enc);
         
         enc->endEncoding();
         cmd->presentDrawable(drawable);
         cmd->commit();
-        
+
         pool->release();
     }
 }

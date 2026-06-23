@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		C135FE252FE9ADA400967827 /* imgui_adaptor.mm in Sources */ = {isa = PBXBuildFile; fileRef = C135FE242FE9ADA400967827 /* imgui_adaptor.mm */; };
 		C1D259262FDF1CED001F1756 /* main.cpp in Sources */ = {isa = PBXBuildFile; fileRef = C1D259252FDF1CED001F1756 /* main.cpp */; };
 		C1D25A4D2FDF210F001F1756 /* MetalKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1D25A4C2FDF210F001F1756 /* MetalKit.framework */; };
 		C1D25A4F2FDF2116001F1756 /* AppKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = C1D25A4E2FDF2116001F1756 /* AppKit.framework */; };
@@ -30,6 +31,10 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		C13504762FEAF31C00967827 /* example_apple_metal.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = example_apple_metal.xcodeproj; sourceTree = "<group>"; };
+		C135047B2FEAF31C00967827 /* example_apple_opengl2.xcodeproj */ = {isa = PBXFileReference; lastKnownFileType = "wrapper.pb-project"; path = example_apple_opengl2.xcodeproj; sourceTree = "<group>"; };
+		C135FE242FE9ADA400967827 /* imgui_adaptor.mm */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.objcpp; path = imgui_adaptor.mm; sourceTree = "<group>"; };
+		C135FE262FE9ADBA00967827 /* imgui_adaptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = imgui_adaptor.h; sourceTree = "<group>"; };
 		C1D257682FDF1BBF001F1756 /* MetalTest */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = MetalTest; sourceTree = BUILT_PRODUCTS_DIR; };
 		C1D259252FDF1CED001F1756 /* main.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = main.cpp; sourceTree = "<group>"; };
 		C1D25A4C2FDF210F001F1756 /* MetalKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MetalKit.framework; path = System/Library/Frameworks/MetalKit.framework; sourceTree = SDKROOT; };
@@ -44,7 +49,30 @@
 		C1D25A692FE66583001F1756 /* glfw_adaptor.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = glfw_adaptor.h; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		C13506092FEAF33D00967827 /* Exceptions for "third_party" folder in "MetalTest" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"imgui-1.92.8/backends/imgui_impl_glfw.cpp",
+				"imgui-1.92.8/backends/imgui_impl_metal.mm",
+				"imgui-1.92.8/imgui_draw.cpp",
+				"imgui-1.92.8/imgui_tables.cpp",
+				"imgui-1.92.8/imgui_widgets.cpp",
+				"imgui-1.92.8/imgui.cpp",
+			);
+			target = C1D257672FDF1BBF001F1756 /* MetalTest */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		C13505F92FEAF31C00967827 /* third_party */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				C13506092FEAF33D00967827 /* Exceptions for "third_party" folder in "MetalTest" target */,
+			);
+			path = third_party;
+			sourceTree = "<group>";
+		};
 		C1D25A582FE4DDF6001F1756 /* shaders */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = shaders;
@@ -67,9 +95,26 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		C13505FA2FEAF31C00967827 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		C13505FC2FEAF31C00967827 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
 		C1D2575F2FDF1BBF001F1756 = {
 			isa = PBXGroup;
 			children = (
+				C13505F92FEAF31C00967827 /* third_party */,
+				C135FE262FE9ADBA00967827 /* imgui_adaptor.h */,
+				C135FE242FE9ADA400967827 /* imgui_adaptor.mm */,
 				C1D25A692FE66583001F1756 /* glfw_adaptor.h */,
 				C1D25A672FE66537001F1756 /* glfw_adaptor.mm */,
 				C1D25A5E2FE519EB001F1756 /* camera.h */,
@@ -154,6 +199,16 @@
 			preferredProjectObjectVersion = 77;
 			productRefGroup = C1D257692FDF1BBF001F1756 /* Products */;
 			projectDirPath = "";
+			projectReferences = (
+				{
+					ProductGroup = C13505FC2FEAF31C00967827 /* Products */;
+					ProjectRef = C13504762FEAF31C00967827 /* example_apple_metal.xcodeproj */;
+				},
+				{
+					ProductGroup = C13505FA2FEAF31C00967827 /* Products */;
+					ProjectRef = C135047B2FEAF31C00967827 /* example_apple_opengl2.xcodeproj */;
+				},
+			);
 			projectRoot = "";
 			targets = (
 				C1D257672FDF1BBF001F1756 /* MetalTest */,
@@ -168,6 +223,7 @@
 			files = (
 				C1D25A602FE519EB001F1756 /* camera.cpp in Sources */,
 				C1D25A552FDFD37C001F1756 /* application.cpp in Sources */,
+				C135FE252FE9ADA400967827 /* imgui_adaptor.mm in Sources */,
 				C1D259262FDF1CED001F1756 /* main.cpp in Sources */,
 				C1D25A682FE66537001F1756 /* glfw_adaptor.mm in Sources */,
 			);
@@ -301,11 +357,15 @@
 					"$(PROJECT_DIR)/third_party",
 					"$(PROJECT_DIR)/third_party/glfw/include",
 					"$(PROJECT_DIR)/third_party/stb_image",
+					"$(PROJECT_DIR)/third_party/imgui-1.92.8/",
+					"$(PROJECT_DIR)/third_party/imgui-1.92.8/backends/",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/third_party/glfw/lib-arm64",
+					"$(PROJECT_DIR)/third_party/imgui-1.92.8/examples/libs/glfw/lib-vc2010-32",
+					"$(PROJECT_DIR)/third_party/imgui-1.92.8/examples/libs/glfw/lib-vc2010-64",
 				);
 				"MTL_HEADER_SEARCH_PATHS[sdk=*]" = "$(PROJECT_DIR)/shaders";
 				OTHER_LDFLAGS = "-lglfw3";
@@ -325,11 +385,15 @@
 					"$(PROJECT_DIR)/third_party",
 					"$(PROJECT_DIR)/third_party/glfw/include",
 					"$(PROJECT_DIR)/third_party/stb_image",
+					"$(PROJECT_DIR)/third_party/imgui-1.92.8/",
+					"$(PROJECT_DIR)/third_party/imgui-1.92.8/backends",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
 					"$(PROJECT_DIR)",
 					"$(PROJECT_DIR)/third_party/glfw/lib-arm64",
+					"$(PROJECT_DIR)/third_party/imgui-1.92.8/examples/libs/glfw/lib-vc2010-32",
+					"$(PROJECT_DIR)/third_party/imgui-1.92.8/examples/libs/glfw/lib-vc2010-64",
 				);
 				MTL_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/shaders";
 				OTHER_LDFLAGS = "-lglfw3";
