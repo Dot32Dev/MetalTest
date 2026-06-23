@@ -62,7 +62,7 @@ Application::Application() {
     wireframe = false;
 
     // Steal the underlying NS::Window from GLFW
-    window = ((NS::Window*)get_ns_window(glfw_window, layer))->retain();
+    window = get_ns_window(glfw_window, layer)->retain();
     
     NS::Menu* menu = createMenuBar();
     NS::Application* app = NS::Application::sharedApplication();

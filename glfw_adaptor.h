@@ -13,12 +13,17 @@
 #define GLFW_EXPOSE_NATIVE_COCOA
 #include <GLFW/glfw3native.h>
 
+// Including metal-cpp headers into the Objective C environment has a fit about
+// casting, so instead we forward declare the types 
+namespace NS {class Window;}
+namespace CA {class MetalLayer;}
+
 /// @brief Get the metal-cpp NS::Window from the GLFW window
-/// Works with void pointers because including metal-cpp in the objective c file
-/// presented casting errors.
+/// GLFW only returns the Objective C "ID", and we need the casted C++ wrapper, so I wrap the GLFW
+/// function in here.
 /// @param window The GLFW window.
 /// @param layer The CA::MetalLayer to place on the window.
 /// @return The NS::Window to do native window activities with.
-void* get_ns_window(GLFWwindow* window, void* layer);
+NS::Window* get_ns_window(GLFWwindow* window, CA::MetalLayer* layer);
 
 #endif /* glfw_adaptor_h */
