@@ -64,8 +64,8 @@ Application::Application() {
     imgui_init_metal(device);
 
     command_queue = device->newCommandQueue()->retain();
-//    loadTerrain("height128.raw", 128);
-    loadModel("Player/Player.obj");
+//    loadTerrain("res/height128.raw", 128);
+    loadModel("res/Player/Player.obj");
     pipeline = buildShader(
         "vertex_main",
         "frag_main"
@@ -117,7 +117,7 @@ Application::Application() {
     // Texture
     int img_w, img_h, img_chann;
     unsigned char *data = stbi_load(
-        "rocky_terrain_03_diff_4k.jpg",
+        "res/rocky_terrain_03_diff_4k.jpg",
         &img_w,
         &img_h,
         &img_chann,
