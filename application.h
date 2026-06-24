@@ -50,6 +50,7 @@ class Application {
         glm::mat4 projection;
         bool wireframe;
         void loadTerrain(std::string file_name, int size);
+        void loadModel(std::string file_name);
         void buildTriangle();
         void buildQuad();
         MTL::RenderPipelineState* buildShader(

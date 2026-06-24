@@ -21,6 +21,9 @@
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
 #include <imgui_impl_metal.h>
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 using NS::StringEncoding::UTF8StringEncoding;
 using std::string;
@@ -51,6 +54,7 @@ Application::Application() {
     layer->setDevice(device);
     layer->setPixelFormat(MTL::PixelFormat::PixelFormatBGRA8Unorm_sRGB);
     
+    // Init ImGUI
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
@@ -60,7 +64,8 @@ Application::Application() {
     imgui_init_metal(device);
 
     command_queue = device->newCommandQueue()->retain();
-    loadTerrain("height128.raw", 128);
+//    loadTerrain("height128.raw", 128);
+    loadModel("Player/Player.obj");
     pipeline = buildShader(
         "vertex_main",
         "frag_main"
@@ -284,6 +289,74 @@ void Application::loadTerrain(string file_name, int size) {
             index_vector.push_back(z * size + x + 1); // Top right of tile
             index_vector.push_back((z + 1) * size + x + 1); // Bottom right
             index_vector.push_back((z + 1) * size + x); // Bottom left of tile
+        }
+    }
+    
+    index_count = (int)index_vector.size();
+    
+    vertex_buffer = device->newBuffer(
+        vert_vector.size() * sizeof(Vertex),
+        MTL::ResourceStorageModeManaged
+    );
+    memcpy(
+        vertex_buffer->contents(),
+        vert_vector.data(),
+        vert_vector.size() * sizeof(Vertex)
+    );
+    vertex_buffer->didModifyRange(
+        NS::Range(0, vert_vector.size() * sizeof(Vertex))
+    );
+      
+    index_buffer = device->newBuffer(
+        index_count * sizeof(ushort),
+        MTL::ResourceStorageModeManaged
+    );
+    memcpy(index_buffer->contents(),
+        index_vector.data(),
+        index_count * sizeof(ushort)
+    );
+    index_buffer->didModifyRange(NS::Range(0, index_count * sizeof(ushort)));
+}
+
+void Application::loadModel(string file_name) {
+    Assimp::Importer importer;
+    const aiScene* scene = importer.ReadFile(file_name,
+        aiProcess_CalcTangentSpace       |
+        aiProcess_MakeLeftHanded         |
+        aiProcess_Triangulate            |
+        aiProcess_JoinIdenticalVertices  |
+        aiProcess_SortByPType
+    );
+    if (scene == nullptr) {
+        std::cerr << "Could not load scene " << file_name << std::endl;
+        return;
+    }
+    
+    vector<Vertex> vert_vector = vector<Vertex>();
+    vector<ushort> index_vector = vector<ushort>();
+    
+    for (int i = 0; i < scene->mNumMeshes; i++) {
+        int start_vert = (int)vert_vector.size();
+        for (int j = 0; j < scene->mMeshes[i]->mNumVertices; j++) {
+            vert_vector.push_back({
+                {
+                    scene->mMeshes[i]->mVertices[j].x*100.0f,
+                    scene->mMeshes[i]->mVertices[j].y*100.0f,
+                    scene->mMeshes[i]->mVertices[j].z*100.0f
+                },
+                {
+                    scene->mMeshes[i]->mTextureCoords[0][j].x,
+                    scene->mMeshes[i]->mTextureCoords[0][j].y
+                }
+            });
+        }
+        
+        for (int j = 0; j < scene->mMeshes[i]->mNumFaces; j++) {
+            for (int k = 0; k < scene->mMeshes[i]->mFaces[j].mNumIndices; k++ ){
+                index_vector.push_back(
+                    start_vert + scene->mMeshes[i]->mFaces[j].mIndices[k]
+                );
+            }
         }
     }
     

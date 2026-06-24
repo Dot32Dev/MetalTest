@@ -359,6 +359,7 @@
 					"$(PROJECT_DIR)/third_party/stb_image",
 					"$(PROJECT_DIR)/third_party/imgui-1.92.8/",
 					"$(PROJECT_DIR)/third_party/imgui-1.92.8/backends/",
+					"$(PROJECT_DIR)/third_party/assimp/6.0.4/include",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -366,9 +367,13 @@
 					"$(PROJECT_DIR)/third_party/glfw/lib-arm64",
 					"$(PROJECT_DIR)/third_party/imgui-1.92.8/examples/libs/glfw/lib-vc2010-32",
 					"$(PROJECT_DIR)/third_party/imgui-1.92.8/examples/libs/glfw/lib-vc2010-64",
+					"$(PROJECT_DIR)/third_party/assimp/6.0.4/lib",
 				);
 				"MTL_HEADER_SEARCH_PATHS[sdk=*]" = "$(PROJECT_DIR)/shaders";
-				OTHER_LDFLAGS = "-lglfw3";
+				OTHER_LDFLAGS = (
+					"-lglfw3",
+					"-lassimp",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 6.0;
@@ -387,6 +392,7 @@
 					"$(PROJECT_DIR)/third_party/stb_image",
 					"$(PROJECT_DIR)/third_party/imgui-1.92.8/",
 					"$(PROJECT_DIR)/third_party/imgui-1.92.8/backends",
+					"$(PROJECT_DIR)/third_party/assimp/6.0.4/include",
 				);
 				LIBRARY_SEARCH_PATHS = (
 					"$(inherited)",
@@ -394,9 +400,13 @@
 					"$(PROJECT_DIR)/third_party/glfw/lib-arm64",
 					"$(PROJECT_DIR)/third_party/imgui-1.92.8/examples/libs/glfw/lib-vc2010-32",
 					"$(PROJECT_DIR)/third_party/imgui-1.92.8/examples/libs/glfw/lib-vc2010-64",
+					"$(PROJECT_DIR)/third_party/assimp/6.0.4/lib",
 				);
 				MTL_HEADER_SEARCH_PATHS = "$(PROJECT_DIR)/shaders";
-				OTHER_LDFLAGS = "-lglfw3";
+				OTHER_LDFLAGS = (
+					"-lglfw3",
+					"-lassimp",
+				);
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SWIFT_VERSION = 6.0;
 			};

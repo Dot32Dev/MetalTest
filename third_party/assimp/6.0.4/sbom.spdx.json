@@ -1,0 +1,87 @@
+{
+  "SPDXID": "SPDXRef-DOCUMENT",
+  "spdxVersion": "SPDX-2.3",
+  "name": "SBOM-SPDX-assimp-6.0.4",
+  "creationInfo": {
+    "created": "2026-06-24T10:09:27Z",
+    "creators": [
+      "Tool: https://github.com/Homebrew/brew@5.0.14"
+    ]
+  },
+  "dataLicense": "CC0-1.0",
+  "documentNamespace": "https://formulae.brew.sh/spdx/assimp-6.0.4.json",
+  "documentDescribes": [
+    "SPDXRef-Archive-assimp-src",
+    "SPDXRef-Compiler",
+    "SPDXRef-Bottle-assimp"
+  ],
+  "files": [],
+  "packages": [
+    {
+      "SPDXID": "SPDXRef-Archive-assimp-src",
+      "name": "assimp",
+      "versionInfo": "6.0.4",
+      "filesAnalyzed": false,
+      "licenseDeclared": "NOASSERTION",
+      "builtDate": "2026-01-24 20:57:37 UTC",
+      "licenseConcluded": "BSD-3-Clause AND CC-PDDC AND MIT AND BSL-1.0 AND Unlicense AND Zlib",
+      "downloadLocation": "https://github.com/assimp/assimp/archive/refs/tags/v6.0.4.tar.gz",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [],
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "afa5487efdd285661afa842c85187cd8c541edad92e8d4aa85be4fca7476eccc"
+        }
+      ]
+    },
+    {
+      "SPDXID": "SPDXRef-Compiler",
+      "name": "clang",
+      "versionInfo": "16.4",
+      "filesAnalyzed": false,
+      "licenseDeclared": "NOASSERTION",
+      "licenseConcluded": "NOASSERTION",
+      "copyrightText": "NOASSERTION",
+      "downloadLocation": "NOASSERTION",
+      "checksums": [],
+      "externalRefs": []
+    },
+    {
+      "SPDXID": "SPDXRef-Bottle-assimp",
+      "name": "assimp",
+      "versionInfo": "6.0.4",
+      "filesAnalyzed": false,
+      "licenseDeclared": "NOASSERTION",
+      "builtDate": "2026-01-24 20:57:37 UTC",
+      "licenseConcluded": "BSD-3-Clause AND CC-PDDC AND MIT AND BSL-1.0 AND Unlicense AND Zlib",
+      "downloadLocation": "https://ghcr.io/v2/homebrew/core/assimp/blobs/sha256:3b3010df5e86ee71ed540a702249bd592d7de657fbd9211cb218256616c10479",
+      "copyrightText": "NOASSERTION",
+      "externalRefs": [
+        {
+          "referenceCategory": "PACKAGE-MANAGER",
+          "referenceLocator": "pkg:brew/homebrew/core/assimp@6.0.4",
+          "referenceType": "purl"
+        }
+      ],
+      "checksums": [
+        {
+          "algorithm": "SHA256",
+          "checksumValue": "3b3010df5e86ee71ed540a702249bd592d7de657fbd9211cb218256616c10479"
+        }
+      ]
+    }
+  ],
+  "relationships": [
+    {
+      "spdxElementId": "SPDXRef-File-assimp",
+      "relationshipType": "PACKAGE_OF",
+      "relatedSpdxElement": "SPDXRef-Archive-assimp-src"
+    },
+    {
+      "spdxElementId": "SPDXRef-Compiler",
+      "relationshipType": "BUILD_TOOL_OF",
+      "relatedSpdxElement": "SPDXRef-Package-assimp-src"
+    }
+  ]
+}
